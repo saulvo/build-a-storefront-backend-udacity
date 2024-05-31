@@ -3,7 +3,8 @@ import express, { Request, Response } from "express";
 import { productRoute } from "./routes";
 
 const app: express.Application = express();
-const address: string = "0.0.0.0:3000";
+const port = 3000;
+const address: string = `http://127.0.0.1:${port}`;
 
 app.use(bodyParser.json());
 
