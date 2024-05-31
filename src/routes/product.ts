@@ -1,33 +1,66 @@
-interface IProductCreate {
-  name: string;
-  price: string;
-  category: string;
-}
-export interface IProduct extends IProductCreate {
-  id: string;
-  name: string;
-  price: string;
-  category: string;
-}
+import { ProductModel } from "@/models";
+import express, { Request, Response } from "express";
 
-export class ProductModel {
-  async getAll(): Promise<IProduct[]> {
-    return [];
-  }
+const productModel = new ProductModel();
 
-  async create(product: IProductCreate): Promise<IProduct> {
-    return { ...product, id: "1" };
+const getAllProducts = async (_: Request, res: Response) => {
+  try {
+    const products = await productModel.getAll();
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json(error);
   }
+};
 
-  async getById(id: string): Promise<IProduct | null> {
-    return null;
+const getProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await productModel.get(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json(error);
   }
+};
 
-  async update(id: string, product: IProductCreate): Promise<IProduct | null> {
-    return null;
+const createProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await productModel.create(req.body);
+    res.status(201).json(product);
+  } catch (error) {
+    res.status(500).json(error);
   }
+};
 
-  async delete(id: string): Promise<IProduct | null> {
-    return null;
+const updateProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await productModel.update(req.params.id, req.body);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(product);
+  } catch (error) {}
+};
+
+const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await productModel.delete(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json({ message: "Product deleted" });
+  } catch (error) {
+    res.status(500).json(error);
   }
-}
+};
+
+const productRoute = (app: express.Application) => {
+  app.get("/products", getAllProducts);
+  app.get("/products/:id", getProduct);
+  app.post("/products", createProduct);
+  app.put("/products/:id", updateProduct);
+  app.delete("/products/:id", deleteProduct);
+};
+
+export { productRoute };
