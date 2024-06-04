@@ -1,5 +1,1 @@
-CREATE TABLE products (
-  id    SERIAL PRIMARY KEY,
-  name  VARCHAR(250) NOT NULL,
-  price INTEGER      NOT NULL
-);
+CREATE TABLE products (id SERIAL PRIMARY KEY, name varchar(100), price int, category varchar(100));

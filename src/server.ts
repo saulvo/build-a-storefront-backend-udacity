@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import express, { Request, Response } from "express";
 import { productRoute } from "./handlers";
+import { userRoute } from "./handlers/user";
 
 const app: express.Application = express();
 const port = 3000;
@@ -13,6 +14,7 @@ app.get("/", function (req: Request, res: Response) {
 });
 
 productRoute(app);
+userRoute(app);
 
 app.listen(3000, function () {
   console.log(`starting app on: ${address}`);

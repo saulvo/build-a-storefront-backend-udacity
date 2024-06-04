@@ -29,6 +29,7 @@ const createProduct = async (req: Request, res: Response) => {
     const product = await productModel.create(req.body);
     res.status(201).json(product);
   } catch (error) {
+    console.log(error);
     res.status(500).json(error);
   }
 };
