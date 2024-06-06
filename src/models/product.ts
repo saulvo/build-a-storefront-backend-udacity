@@ -1,4 +1,4 @@
-import { IProduct } from "@/types";
+import { BaseOrder, IProduct } from "@/types";
 import db from "@/database";
 
 export class ProductModel {
@@ -45,19 +45,19 @@ export class ProductModel {
       throw new Error("Cannot create new product");
     }
   }
-  async update(id: string, product: IProduct): Promise<IProduct> {
+  async update(id: number, orderData: BaseOrder): Promise<IProduct> {
     try {
-      const sqlQuery =
+      const { products, user_id, status } = orderData;
+      const sqlQueryOrder =
         "UPDATE products SET name = $1, price = $2, category = $3 WHERE id = $4 RETURNING *";
       const connect = await db.connect();
-      const result = await connect.query(sqlQuery, [
-        product.name,
-        product.price,
-        product.category,
+      const result = await connect.query(sqlQueryOrder, [
+        products,
+        user_id,
+        status,
         id,
       ]);
-      connect.release();
-      return result.rows[0];
+      conn;
     } catch (error) {
       throw new Error("Cannot update current product");
     }
