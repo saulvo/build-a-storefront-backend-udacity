@@ -1,7 +1,6 @@
 import bodyParser from "body-parser";
 import express, { Request, Response } from "express";
-import { productRoute } from "./handlers";
-import { userRoute } from "./handlers/user";
+import { orderRouter, productRoute, userRoute } from "./handlers";
 
 const app: express.Application = express();
 const port = 3000;
@@ -14,6 +13,7 @@ app.get("/", function (req: Request, res: Response) {
 });
 
 productRoute(app);
+orderRouter(app);
 userRoute(app);
 
 app.listen(3000, function () {

@@ -89,7 +89,7 @@ export class UserModel {
         throw new Error("Cannot found current user");
       }
       const user = result.rows[0];
-      const isPasswordMatch = await bcrypt.compare(password, user.password);
+      const isPasswordMatch = bcrypt.compareSync(password, user.password);
       if (!isPasswordMatch) {
         throw new Error("Password is incorrect");
       }

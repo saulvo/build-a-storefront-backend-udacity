@@ -14,7 +14,9 @@ const getAllProducts = async (_: Request, res: Response) => {
 
 const getProduct = async (req: Request, res: Response) => {
   try {
-    const product = await productModel.get(req.params.id);
+    const id = req.params.id as unknown as number;
+    if (!id) res.status(400).json({ message: "Invalid id" });
+    const product = await productModel.get(id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -36,7 +38,20 @@ const createProduct = async (req: Request, res: Response) => {
 
 const updateProduct = async (req: Request, res: Response) => {
   try {
-    const product = await productModel.update(req.params.id, req.body);
+    const id = req.params.id as unknown as number;
+    if (!id) res.status(400).json({ message: "Invalid id" });
+
+    const name = req.body.name as unknown as string;
+    const price = req.body.price as unknown as number;
+    const category = req.body.category as unknown as string;
+    if (!name || !price || !category)
+      res.status(400).json({ message: "Invalid data" });
+
+    const product = await productModel.update(id, {
+      name,
+      price,
+      category,
+    });
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -46,7 +61,9 @@ const updateProduct = async (req: Request, res: Response) => {
 
 const deleteProduct = async (req: Request, res: Response) => {
   try {
-    const product = await productModel.delete(req.params.id);
+    const id = req.params.id as unknown as number;
+    if (!id) res.status(400).json({ message: "Invalid id" });
+    const product = await productModel.delete(id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }

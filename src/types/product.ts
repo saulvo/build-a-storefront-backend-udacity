@@ -1,9 +1,9 @@
-export interface IProductCreate {
+export interface IProductBase {
   name: string;
-  price: string;
+  price: number;
   category: string;
 }
 
-export interface IProduct extends IProductCreate {
-  id: string;
+export interface IProduct extends IProductBase {
+  id: number;
 }

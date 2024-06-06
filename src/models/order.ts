@@ -4,38 +4,44 @@ import { BaseOrder, IOrder } from "@/types";
 export class OrderModel {
   async getAll(): Promise<IOrder[]> {
     try {
+      const sqlQueryOrder = "SELECT * FROM orders";
       const connect = await db.connect();
-      const sqlQuery = `
-        SELECT orders.*, products.*
-        FROM orders
-        INNER JOIN order_products ON orders.id = order_products.order_id
-        INNER JOIN products ON order_products.product_id = products.id;
-      `;
-      const result = await connect.query(sqlQuery);
+      const resultOrder = await connect.query(sqlQueryOrder);
+      const sqlQueryOrderProduct = "SELECT * FROM order_products";
+      const resultOrderProduct = await connect.query(sqlQueryOrderProduct);
+      const orders = resultOrder.rows;
+      const products = resultOrderProduct.rows;
       connect.release();
-      return result.rows;
+
+      return orders.map((order: IOrder) => {
+        const orderProducts = products.filter(
+          (product: any) => product.order_id === order.id,
+        );
+        return { ...order, products: orderProducts };
+      });
     } catch (error) {
       throw new Error("Cannot get any order");
     }
   }
   async get(id: string): Promise<IOrder> {
     try {
+      const sqlQueryOrder = "SELECT * FROM orders WHERE id = $1";
       const connect = await db.connect();
-      const sqlQuery = `
-      SELECT orders.*, products.*
-      FROM orders
-      INNER JOIN order_products ON orders.id = order_products.order_id
-      INNER JOIN products ON order_products.product_id = products.id
-      WHERE orders.id = ($1);
-      `;
-      const result = await connect.query(sqlQuery, [id]);
+      const resultOrder = await connect.query(sqlQueryOrder, [id]);
+      const sqlQueryOrderProduct =
+        "SELECT * FROM order_products WHERE order_id = $1";
+      const resultOrderProduct = await connect.query(sqlQueryOrderProduct, [
+        id,
+      ]);
+
+      const products = resultOrderProduct.rows;
       connect.release();
-      return result.rows[0];
+      return { ...resultOrder.rows[0], products };
     } catch (error) {
       throw new Error("Cannot found current order");
     }
   }
-  async create(order: IOrder): Promise<IOrder> {
+  async create(order: BaseOrder): Promise<IOrder> {
     const { products, status, user_id } = order;
     try {
       const sqlQueryOrder =
@@ -45,12 +51,13 @@ export class OrderModel {
 
       const newOrderId = resultOrder.rows[0].id;
       const sqlQueryOrderProduct =
-        "INSERT INTO order_products (order_id, product_id) VALUES ($1, $2)";
+        "INSERT INTO order_products (order_id, product_id, quantity) VALUES ($1, $2, $3)";
 
       for (let product of products) {
         await connect.query(sqlQueryOrderProduct, [
           newOrderId,
           product.product_id,
+          product.quantity,
         ]);
       }
 
@@ -60,7 +67,7 @@ export class OrderModel {
       throw new Error("Cannot create new order");
     }
   }
-  async update(id: string, order: BaseOrder): Promise<IOrder> {
+  async update(id: number, order: BaseOrder): Promise<IOrder> {
     const { products, status, user_id } = order;
     try {
       const sqlQueryOrder =
@@ -86,7 +93,7 @@ export class OrderModel {
     }
   }
 
-  async delete(id: string): Promise<IOrder> {
+  async delete(id: number): Promise<IOrder> {
     try {
       const connect = await db.connect();
       const sqlQueryOrder = "DELETE FROM orders WHERE id = $1 RETURNING *";

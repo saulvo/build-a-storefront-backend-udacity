@@ -1,5 +1,5 @@
-import { BaseOrder, IProduct } from "@/types";
 import db from "@/database";
+import { IProduct, IProductBase } from "@/types";
 
 export class ProductModel {
   async getAll(): Promise<IProduct[]> {
@@ -16,7 +16,7 @@ export class ProductModel {
       }
     }
   }
-  async get(id: string): Promise<IProduct> {
+  async get(id: number): Promise<IProduct> {
     try {
       const connect = await db.connect();
 
@@ -45,24 +45,24 @@ export class ProductModel {
       throw new Error("Cannot create new product");
     }
   }
-  async update(id: number, orderData: BaseOrder): Promise<IProduct> {
+  async update(id: number, product: IProductBase): Promise<IProduct> {
     try {
-      const { products, user_id, status } = orderData;
-      const sqlQueryOrder =
+      const sqlQuery =
         "UPDATE products SET name = $1, price = $2, category = $3 WHERE id = $4 RETURNING *";
       const connect = await db.connect();
-      const result = await connect.query(sqlQueryOrder, [
-        products,
-        user_id,
-        status,
+      const result = await connect.query(sqlQuery, [
+        product.name,
+        product.price,
+        product.category,
         id,
       ]);
-      conn;
+      connect.release();
+      return result.rows[0];
     } catch (error) {
       throw new Error("Cannot update current product");
     }
   }
-  async delete(id: string): Promise<IProduct> {
+  async delete(id: number): Promise<IProduct> {
     try {
       const sqlQuery = "DELETE FROM products WHERE id = $1 RETURNING *";
       const connect = await db.connect();
