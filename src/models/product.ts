@@ -28,7 +28,7 @@ export class ProductModel {
       throw new Error("Cannot found current product");
     }
   }
-  async create(product: IProduct): Promise<IProduct> {
+  async create(product: IProductBase): Promise<IProduct> {
     try {
       const sqlQuery =
         "INSERT INTO products (name, price, category) VALUES ($1, $2, $3) RETURNING *";

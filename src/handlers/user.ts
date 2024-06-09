@@ -15,7 +15,8 @@ const createUser = async (req: Request, res: Response) => {
 
 const getUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as unknown as number;
+    if (!id) res.status(400).json({ message: 'Invalid id' });
     const getUsers = await userModel.get(id);
     res.json(getUsers);
   } catch (error) {
@@ -36,7 +37,8 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as unknown as number;
+    if (!id) res.status(400).json({ message: 'Invalid id' });
     const user = await userModel.update(id, req.body);
     res.json(user);
   } catch (error) {
@@ -47,7 +49,8 @@ const updateUser = async (req: Request, res: Response) => {
 
 const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as unknown as number;
+    if (!id) res.status(400).json({ message: 'Invalid id' });
     const user = await userModel.delete(id);
     res.json(user);
   } catch (error) {

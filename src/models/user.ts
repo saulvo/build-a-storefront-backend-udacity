@@ -16,7 +16,7 @@ export class UserModel {
       }
     }
   }
-  async get(id: string): Promise<IUser> {
+  async get(id: number): Promise<IUser> {
     try {
       const connect = await db.connect();
       const sqlQuery = `SELECT id, firstname, lastname, username FROM users where id = ($1)`;
@@ -50,7 +50,7 @@ export class UserModel {
       throw new Error("Cannot create new user");
     }
   }
-  async update(id: string, user: IUser): Promise<IUser> {
+  async update(id: number, user: IUser): Promise<IUser> {
     try {
       const sqlQuery =
         "UPDATE users SET firstname = $1, lastname = $2, username = $3, password = $4 WHERE id = $5 RETURNING *";
@@ -68,7 +68,7 @@ export class UserModel {
       throw new Error("Cannot update user");
     }
   }
-  async delete(id: string): Promise<IUser> {
+  async delete(id: number): Promise<IUser> {
     try {
       const sqlQuery = "DELETE FROM users WHERE id = $1 RETURNING *";
       const connect = await db.connect();
