@@ -1,0 +1,15 @@
+~[BASE]~
+url http://localhost:3000/products/1
+method PUT
+
+~[HEADERS]~
+accept application/json
+content-type application/json
+
+~[BODY]~
+{
+  "name": "iPhone 14",
+  "price": 1300,
+  "category": "phone"
+}
+

@@ -1,0 +1,15 @@
+~[BASE]~
+url http://localhost:3000/login
+method POST 
+
+~[HEADERS]~
+accept application/json
+content-type application/json
+
+~[BODY]~
+{
+  "username": "saul",
+  "password": "123"
+}
+
+

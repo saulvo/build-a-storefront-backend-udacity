@@ -1,0 +1,16 @@
+~[BASE]~
+url http://localhost:3000/products
+method POST 
+
+~[HEADERS]~
+accept application/json
+content-type application/json
+
+~[BODY]~
+{
+  "name": "Macbook",
+  "price": 3000,
+  "category": "laptop"
+}
+
+
