@@ -1,5 +1,5 @@
 import db from "@/database";
-import { BaseOrder, IOrder } from "@/types";
+import { BaseOrder, IOrder, IOrderDetail } from "@/types";
 
 export class OrderModel {
   async getAll(): Promise<IOrder[]> {
@@ -23,22 +23,55 @@ export class OrderModel {
       throw new Error("Cannot get any order");
     }
   }
-  async get(id: string): Promise<IOrder> {
+  async get(id: string): Promise<IOrderDetail> {
     try {
-      const sqlQueryOrder = "SELECT * FROM orders WHERE id = $1";
-      const connect = await db.connect();
-      const resultOrder = await connect.query(sqlQueryOrder, [id]);
-      const sqlQueryOrderProduct =
-        "SELECT * FROM order_products WHERE order_id = $1";
-      const resultOrderProduct = await connect.query(sqlQueryOrderProduct, [
-        id,
-      ]);
+      const sqlQuery = `
+            SELECT 
+                o.*, 
+                p.*, 
+                u.*, 
+                op.quantity 
+            FROM 
+                orders o 
+            JOIN 
+              users u ON o.user_id = u.id 
+            JOIN 
+                order_products op ON o.id = op.order_id
+            JOIN 
+                products p ON op.product_id = p.id 
+            WHERE 
+                o.id = $1
+        `;
 
-      const products = resultOrderProduct.rows;
+      const connect = await db.connect();
+      const result = await connect.query(sqlQuery, [id]);
       connect.release();
-      return { ...resultOrder.rows[0], products };
+
+      if (result.rows.length === 0) {
+        throw new Error("Order not found");
+      }
+
+      const order: IOrderDetail = {
+        id: result.rows[0].id,
+        status: result.rows[0].status,
+        user: {
+          id: result.rows[0].user_id,
+          firstname: result.rows[0].firstname,
+          lastname: result.rows[0].lastname,
+        },
+        products: result.rows.map((row) => ({
+          product_id: row.product_id,
+          name: row.name,
+          price: row.price,
+          quantity: row.quantity,
+          category: row.category,
+        })),
+      };
+
+      return order;
     } catch (error) {
-      throw new Error("Cannot found current order");
+      console.error("Error fetching order details:", error);
+      throw new Error("Unable to fetch order details");
     }
   }
   async create(order: BaseOrder): Promise<IOrder> {
