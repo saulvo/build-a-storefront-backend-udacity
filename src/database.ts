@@ -12,6 +12,7 @@ const {
 } = process.env;
 
 let config;
+console.log("ENV...", ENV);
 
 if (ENV === "dev") {
   config = {

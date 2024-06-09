@@ -1,7 +1,7 @@
 ~[BASE]~
 url http://localhost:3000/orders
 method POST 
-env /home/saulvo/projects/build-a-storefront-backend-udacity/spec/ship/env/test.lua
+env /home/saulvo/projects/build-a-storefront-backend-udacity/src/tests/ship/env/test.lua
 
 ~[HEADERS]~
 accept application/json
@@ -16,7 +16,7 @@ authorization Bearer {{token}}
       "quantity": 1
     }
   ],
-  "user_id": 1,
+  "user_id": 2,
   "status": true
 }
 

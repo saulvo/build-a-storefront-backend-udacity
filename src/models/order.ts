@@ -1,5 +1,5 @@
 import db from "@/database";
-import { BaseOrder, IOrder, IOrderDetail } from "@/types";
+import { IOrderBase, IOrder, IOrderDetail } from "@/types";
 
 export class OrderModel {
   async getAll(): Promise<IOrder[]> {
@@ -74,21 +74,19 @@ export class OrderModel {
       throw new Error("Unable to fetch order details");
     }
   }
-  async create(order: BaseOrder): Promise<IOrder> {
+  async create(order: IOrderBase): Promise<IOrder> {
     const { products, status, user_id } = order;
     try {
       const sqlQueryOrder =
         "INSERT INTO orders (user_id, status) VALUES ($1, $2) RETURNING *";
       const connect = await db.connect();
       const resultOrder = await connect.query(sqlQueryOrder, [user_id, status]);
-
-      const newOrderId = resultOrder.rows[0].id;
-      const sqlQueryOrderProduct =
-        "INSERT INTO order_products (order_id, product_id, quantity) VALUES ($1, $2, $3)";
-
+      const orderId = resultOrder.rows[0].id;
       for (let product of products) {
+        const sqlQueryOrderProduct =
+          "INSERT INTO order_products (order_id, product_id, quantity) VALUES ($1, $2, $3)";
         await connect.query(sqlQueryOrderProduct, [
-          newOrderId,
+          orderId,
           product.product_id,
           product.quantity,
         ]);
@@ -97,10 +95,11 @@ export class OrderModel {
       connect.release();
       return resultOrder.rows[0];
     } catch (error) {
+      console.log(error);
       throw new Error("Cannot create new order");
     }
   }
-  async update(id: number, order: BaseOrder): Promise<IOrder> {
+  async update(id: number, order: IOrderBase): Promise<IOrder> {
     const { products, status, user_id } = order;
     try {
       const sqlQueryOrder =

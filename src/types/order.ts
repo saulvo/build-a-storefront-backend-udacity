@@ -3,13 +3,13 @@ export interface OrderProduct {
   quantity: number;
 }
 
-export interface BaseOrder {
+export interface IOrderBase {
   products: OrderProduct[];
   user_id: number;
   status: boolean;
 }
 
-export interface IOrder extends BaseOrder {
+export interface IOrder extends IOrderBase {
   id: number;
 }
 

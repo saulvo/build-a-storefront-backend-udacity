@@ -1,5 +1,5 @@
 import db from "@/database";
-import { IUser, IUserCreate } from "@/types";
+import { IUser, IUserBase } from "@/types";
 import bcrypt from "bcrypt";
 
 export class UserModel {
@@ -27,7 +27,7 @@ export class UserModel {
       throw new Error("Cannot find current user");
     }
   }
-  async create(user: IUserCreate): Promise<IUser> {
+  async create(user: IUserBase): Promise<IUser> {
     const { firstname, lastname, username, password } = user;
 
     try {

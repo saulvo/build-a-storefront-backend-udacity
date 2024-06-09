@@ -1,9 +1,10 @@
 ~[BASE]~
-url http://localhost:3000/orders
-method GET
+url http://localhost:3000/users/5
+method  DELETE
 env /home/saulvo/projects/build-a-storefront-backend-udacity/src/tests/ship/env/test.lua
 
 ~[HEADERS]~
 accept application/json
+content-type application/json
 authorization Bearer {{token}}
 
