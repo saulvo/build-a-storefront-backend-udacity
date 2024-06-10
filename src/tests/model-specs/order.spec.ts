@@ -1,5 +1,5 @@
 import { OrderModel, ProductModel, UserModel } from "@/models";
-import { IOrder, IProduct, IUser } from "@/types";
+import { IOrder, IOrderBase, IProduct, IUser } from "@/types";
 
 const userModel = new UserModel();
 const productModel = new ProductModel();
@@ -8,6 +8,7 @@ const orderModel = new OrderModel();
 describe("Order Model", () => {
   let user: IUser | undefined;
   let product: IProduct | undefined;
+  let orderBase: IOrderBase | undefined;
   let order: IOrder | undefined;
 
   beforeAll(async () => {
@@ -22,34 +23,7 @@ describe("Order Model", () => {
       price: 100,
       category: "category",
     });
-  });
-
-  afterAll(async () => {
-    // if (user) {
-    //   await userModel.delete(user.id);
-    //   user = undefined;
-    // }
-    // if (product) {
-    //   await productModel.delete(product.id);
-    //   product = undefined;
-    // }
-  });
-
-  it("should have a show method", () => {
-    expect(orderModel.getAll).toBeDefined();
-  });
-  it("should have a add method", () => {
-    expect(orderModel.create).toBeDefined();
-  });
-  it("should have a delete method", () => {
-    expect(orderModel.delete).toBeDefined();
-  });
-  it("should add a order", async () => {
-    if (!user || !product) {
-      throw new Error("User or Product is not created");
-    }
-
-    const orderBase = {
+    orderBase = {
       products: [
         {
           product_id: product.id,
@@ -57,10 +31,70 @@ describe("Order Model", () => {
         },
       ],
       user_id: user.id,
-      status: true,
+      status: false,
     };
+  });
+
+  afterAll(async () => {
+    if (user) {
+      await userModel.delete(user.id);
+      user = undefined;
+    }
+    if (product) {
+      await productModel.delete(product.id);
+      product = undefined;
+    }
+    orderBase = undefined;
+  });
+
+  it("should have a show method", () => {
+    expect(orderModel.getAll).toBeDefined();
+  });
+
+  it("should have a add method", () => {
+    expect(orderModel.create).toBeDefined();
+  });
+
+  it("should have a delete method", () => {
+    expect(orderModel.delete).toBeDefined();
+  });
+
+  it("should add a order", async () => {
+    if (!user || !product) {
+      throw new Error("User or Product is not created");
+    }
+    if (!orderBase) {
+      throw new Error("Order base is not created");
+    }
     const createdOrder = await orderModel.create(orderBase);
     order = createdOrder;
     expect(createdOrder.id).toBeDefined();
+  });
+
+  it("should return a list of orders", async () => {
+    const orders = await orderModel.getAll();
+    expect(orders.length).toBeGreaterThan(0);
+  });
+
+  it("should update the order", async () => {
+    if (!order) {
+      throw new Error("Order is not created");
+    }
+    if (!orderBase) {
+      throw new Error("Order base is not created");
+    }
+    const updatedOrder = await orderModel.update(order.id, {
+      ...orderBase,
+      status: true,
+    });
+    expect(updatedOrder.status).toBe(true);
+  });
+
+  it("should delete a order", async () => {
+    if (!order) {
+      throw new Error("Order is not created");
+    }
+    const deletedOrder = await orderModel.delete(order.id);
+    expect(deletedOrder.id).toBe(order.id);
   });
 });

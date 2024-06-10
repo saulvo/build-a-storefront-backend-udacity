@@ -102,9 +102,9 @@ export class OrderModel {
   async update(id: number, order: IOrderBase): Promise<IOrder> {
     const { products, status, user_id } = order;
     try {
+      const connect = await db.connect();
       const sqlQueryOrder =
         "UPDATE orders SET user_id = $1, status = $2 WHERE id = $3 RETURNING *";
-      const connect = await db.connect();
       const resultOrder = await connect.query(sqlQueryOrder, [
         user_id,
         status,
@@ -115,12 +115,17 @@ export class OrderModel {
       await connect.query(sqlQueryOrderProduct, [id]);
       for (let product of products) {
         const sqlQueryOrderProduct =
-          "INSERT INTO order_products (order_id, product_id) VALUES ($1, $2)";
-        await connect.query(sqlQueryOrderProduct, [id, product.product_id]);
+          "INSERT INTO order_products (order_id, product_id, quantity) VALUES ($1, $2, $3)";
+        await connect.query(sqlQueryOrderProduct, [
+          id,
+          product.product_id,
+          product.quantity,
+        ]);
       }
       connect.release();
       return resultOrder.rows[0];
     } catch (error) {
+      console.log(error);
       throw new Error("Cannot update current order");
     }
   }
@@ -128,14 +133,15 @@ export class OrderModel {
   async delete(id: number): Promise<IOrder> {
     try {
       const connect = await db.connect();
-      const sqlQueryOrder = "DELETE FROM orders WHERE id = $1 RETURNING *";
-      const resultOrder = await connect.query(sqlQueryOrder, [id]);
       const sqlQueryOrderProduct =
         "DELETE FROM order_products WHERE order_id = $1";
       await connect.query(sqlQueryOrderProduct, [id]);
+      const sqlQueryOrder = "DELETE FROM orders WHERE id = $1 RETURNING *";
+      const resultOrder = await connect.query(sqlQueryOrder, [id]);
       connect.release();
       return resultOrder.rows[0];
     } catch (error) {
+      console.log(error);
       throw new Error("Cannot delete current order");
     }
   }

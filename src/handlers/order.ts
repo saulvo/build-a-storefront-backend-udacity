@@ -17,7 +17,7 @@ const createOrder = async (req: Request, res: Response) => {
     const products = req.body.products as unknown as OrderProduct[];
     const status = req.body.status as unknown as boolean;
     const user_id = req.body.user_id as unknown as number;
-    if (!products || !status || !user_id) {
+    if (!products || status === undefined || !user_id) {
       res.status(400).json({ message: "Invalid body" });
       return;
     }
@@ -46,7 +46,7 @@ const updateOrder = async (req: Request, res: Response) => {
     const products = req.body.products as unknown as OrderProduct[];
     const status = req.body.status as unknown as boolean;
     const user_id = req.body.user_id as unknown as number;
-    if (!products || !status || !user_id) {
+    if (!products || status === undefined || !user_id) {
       res.status(400).json({ message: "Invalid body" });
     }
     const order = await orderModel.update(id, req.body);
