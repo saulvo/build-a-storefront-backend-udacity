@@ -50,16 +50,17 @@ export class UserModel {
       throw new Error("Cannot create new user");
     }
   }
-  async update(id: number, user: IUser): Promise<IUser> {
+  async update(id: number, user: IUserBase): Promise<IUser> {
     try {
       const sqlQuery =
         "UPDATE users SET firstname = $1, lastname = $2, username = $3, password = $4 WHERE id = $5 RETURNING *";
       const connect = await db.connect();
+      const hash = bcrypt.hashSync(user.password, 10);
       const result = await connect.query(sqlQuery, [
         user.firstname,
         user.lastname,
         user.username,
-        user.password,
+        hash,
         id,
       ]);
       connect.release();
