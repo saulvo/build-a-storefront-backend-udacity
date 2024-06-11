@@ -45,7 +45,7 @@ describe("Product Model", () => {
     expect(products).toBeDefined();
   });
 
-  it("should update the order", async () => {
+  it("should update the product", async () => {
     const updatedProduct = await productModel.update(product!.id, {
       name: "new product",
       price: 200,
