@@ -51,8 +51,16 @@ describe("Order Model", () => {
     expect(orderModel.getAll).toBeDefined();
   });
 
+  it("should have a get method", () => {
+    expect(orderModel.get).toBeDefined();
+  });
+
   it("should have a add method", () => {
     expect(orderModel.create).toBeDefined();
+  });
+
+  it("should have a update method", () => {
+    expect(orderModel.update).toBeDefined();
   });
 
   it("should have a delete method", () => {
