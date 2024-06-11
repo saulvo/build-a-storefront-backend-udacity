@@ -16,6 +16,8 @@ productRoute(app);
 orderRouter(app);
 userRoute(app);
 
-app.listen(3000, function () {
+app.listen(port, function () {
   console.log(`starting app on: ${address}`);
 });
+
+export default app;

@@ -1,7 +1,7 @@
 ~[BASE]~
 url http://localhost:3000/orders/1
 method GET
-env /home/saulvo/projects/build-a-storefront-backend-udacity/src/tests/ship/env/test.lua
+env /home/saulvo/projects/build-a-storefront-backend-udacity/src/ship/env/test.lua
 
 ~[HEADERS]~
 accept application/json
