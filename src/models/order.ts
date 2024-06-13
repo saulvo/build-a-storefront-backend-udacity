@@ -133,6 +133,14 @@ export class OrderModel {
   async delete(id: number): Promise<IOrder> {
     try {
       const connect = await db.connect();
+
+      const findOrderQuery = "SELECT * FROM orders WHERE id = $1";
+      const findOrderResult = await connect.query(findOrderQuery, [id]);
+
+      if (findOrderResult.rows.length === 0) {
+        throw new Error("Order not found");
+      }
+
       const sqlQueryOrderProduct =
         "DELETE FROM order_products WHERE order_id = $1";
       await connect.query(sqlQueryOrderProduct, [id]);
@@ -141,7 +149,6 @@ export class OrderModel {
       connect.release();
       return resultOrder.rows[0];
     } catch (error) {
-      console.log(error);
       throw new Error("Cannot delete current order");
     }
   }

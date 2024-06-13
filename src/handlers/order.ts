@@ -37,7 +37,7 @@ const getOrder = async (req: Request, res: Response) => {
     const order = await orderModel.get(id);
     res.status(200).json(order);
   } catch (error) {
-    res.status(500).json(error);
+    res.status(404).json(error);
   }
 };
 const updateOrder = async (req: Request, res: Response) => {
