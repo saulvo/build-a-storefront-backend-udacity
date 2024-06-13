@@ -1,10 +1,10 @@
-import { IOrder, IOrderBase, IProduct, IUser } from "@/types";
-import supertest from "supertest";
-import app from "../../server";
+import { IOrder, IOrderBase, IProduct, IUser } from '@/types';
+import supertest from 'supertest';
+import app from '../../server';
 
 const request = supertest(app);
 
-describe("Order Handler", () => {
+describe('Order Handler', () => {
   let user: IUser;
   let token: string;
   let product: IProduct;
@@ -12,24 +12,24 @@ describe("Order Handler", () => {
   let order: IOrder;
 
   beforeAll(async () => {
-    const userResponse = await request.post("/users").send({
-      username: "saul2",
-      password: "123",
-      firstname: "Saul",
-      lastname: "Vo",
+    const userResponse = await request.post('/users').send({
+      username: 'saul2',
+      password: '123',
+      firstname: 'Saul',
+      lastname: 'Vo',
     });
     user = userResponse.body;
 
-    const loginResponse = await request.post("/login").send({
-      username: "saul2",
-      password: "123",
+    const loginResponse = await request.post('/login').send({
+      username: 'saul2',
+      password: '123',
     });
     token = loginResponse.body.token;
 
-    const productResponse = await request.post("/products").send({
-      name: "product",
+    const productResponse = await request.post('/products').set('Authorization', `Bearer ${token}`).send({
+      name: 'product',
       price: 100,
-      category: "category",
+      category: 'category',
     });
     product = productResponse.body;
 
@@ -45,30 +45,25 @@ describe("Order Handler", () => {
     };
   });
 
-  it("should create a new order", async () => {
-    const response = await request
-      .post("/orders")
-      .set("Authorization", `Bearer ${token}`)
-      .send(orderBase);
+  it('should create a new order', async () => {
+    const response = await request.post('/orders').set('Authorization', `Bearer ${token}`).send(orderBase);
     order = response.body;
     expect(response.status).toBe(200);
     expect(order.id).toBeDefined();
   });
 
-  it("should retrieve the order", async () => {
-    const response = await request
-      .get(`/orders/${order.id}`)
-      .set("Authorization", `Bearer ${token}`);
+  it('should retrieve the order', async () => {
+    const response = await request.get(`/orders/${order.id}`).set('Authorization', `Bearer ${token}`);
 
     const retrievedOrder = response.body;
     expect(response.status).toBe(200);
     expect(retrievedOrder.id).toEqual(order.id);
   });
 
-  it("should update the order", async () => {
+  it('should update the order', async () => {
     const response = await request
       .put(`/orders/${order.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set('Authorization', `Bearer ${token}`)
       .send({ ...orderBase, status: true });
 
     const updatedOrder = response.body;
@@ -76,14 +71,10 @@ describe("Order Handler", () => {
     expect(updatedOrder.status).toBe(true);
   });
 
-  it("should delete the order", async () => {
-    await request
-      .delete(`/orders/${order.id}`)
-      .set("Authorization", `Bearer ${token}`);
+  it('should delete the order', async () => {
+    await request.delete(`/orders/${order.id}`).set('Authorization', `Bearer ${token}`);
 
-    const response = await request
-      .get(`/orders/${order.id}`)
-      .set("Authorization", `Bearer ${token}`);
+    const response = await request.get(`/orders/${order.id}`).set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(404);
   });

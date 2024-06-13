@@ -1,50 +1,62 @@
-import { IProductBase } from "@/types";
-import supertest from "supertest";
-import app from "../../server";
+import { IProductBase, IUser } from '@/types';
+import supertest from 'supertest';
+import app from '../../server';
 
 const request = supertest(app);
 
-describe("Product Handler", () => {
+describe('Product Handler', () => {
+  let user: IUser;
+  let token: string;
   let productBase: IProductBase = {
-    name: "product",
+    name: 'product',
     price: 100,
-    category: "category",
+    category: 'category',
   };
   let productId: number | undefined;
 
-  it("should get the create endpoint", async (done) => {
-    const res = await request.post("/products").send(productBase);
+  beforeAll(async () => {
+    const userResponse = await request.post('/users').send({
+      username: 'saul3',
+      password: '123',
+      firstname: 'Saul',
+      lastname: 'Vo',
+    });
+    user = userResponse.body;
+
+    const loginResponse = await request.post('/login').send({
+      username: 'saul3',
+      password: '123',
+    });
+    token = loginResponse.body.token;
+  });
+
+  it('should create a product', async () => {
+    const res = await request.post('/products').set('Authorization', `Bearer ${token}`).send(productBase);
     const { id } = res.body;
     productId = id;
     expect(res.status).toBe(200);
-    done();
   });
 
-  it("should get the read endpoint", async (done) => {
+  it('should get a product', async () => {
     const res = await request.get(`/products/${productId}`);
+
     expect(res.status).toBe(200);
-    done();
+    expect(res.body.id).toBe(productId);
   });
 
-  it("should get the list endpoint", async (done) => {
-    const res = await request.get("/products");
+  it('should update a product', async () => {
+    const updatedProduct = { ...productBase, name: 'updated product' };
+    let res = await request.put(`/products/${productId}`).set('Authorization', `Bearer ${token}`).send(updatedProduct);
     expect(res.status).toBe(200);
-    done();
+    expect(res.body.name).toBe('updated product');
   });
 
-  it("should get the update endpoint", async (done) => {
-    const res = await request.put(`/products/${productId}`).send({
-      name: "new product",
-      price: 200,
-      category: "new category",
-    });
+  it('should delete a product', async () => {
+    let res = await request.delete(`/products/${productId}`).set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
-    done();
   });
 
-  it("should get the delete endpoint", async (done) => {
-    const res = await request.delete(`/products/${productId}`);
-    expect(res.status).toBe(200);
-    done();
+  afterAll(async () => {
+    await request.delete(`/users/${user.id}`);
   });
 });

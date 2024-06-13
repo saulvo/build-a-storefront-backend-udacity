@@ -23,7 +23,7 @@ if (ENV === "dev") {
   };
 }
 
-if (ENV === "TEST") {
+if (ENV === "test") {
   config = {
     host: POSTGRES_HOST,
     database: POSTGRES_TEST_DB,

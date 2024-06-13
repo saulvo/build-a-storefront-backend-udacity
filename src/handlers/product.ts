@@ -1,5 +1,6 @@
-import { ProductModel } from "@/models";
-import express, { Request, Response } from "express";
+import { verifyToken } from '@/helper';
+import { ProductModel } from '@/models';
+import express, { Request, Response } from 'express';
 
 const productModel = new ProductModel();
 
@@ -15,10 +16,10 @@ const getAllProducts = async (_: Request, res: Response) => {
 const getProduct = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as unknown as number;
-    if (!id) res.status(400).json({ message: "Invalid id" });
+    if (!id) res.status(400).json({ message: 'Invalid id' });
     const product = await productModel.get(id);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
     res.status(200).json(product);
   } catch (error) {
@@ -39,13 +40,12 @@ const createProduct = async (req: Request, res: Response) => {
 const updateProduct = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as unknown as number;
-    if (!id) res.status(400).json({ message: "Invalid id" });
+    if (!id) res.status(400).json({ message: 'Invalid id' });
 
     const name = req.body.name as unknown as string;
     const price = req.body.price as unknown as number;
     const category = req.body.category as unknown as string;
-    if (!name || !price || !category)
-      res.status(400).json({ message: "Invalid data" });
+    if (!name || !price || !category) res.status(400).json({ message: 'Invalid data' });
 
     const product = await productModel.update(id, {
       name,
@@ -53,7 +53,7 @@ const updateProduct = async (req: Request, res: Response) => {
       category,
     });
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
     res.status(200).json(product);
   } catch (error) {}
@@ -62,23 +62,23 @@ const updateProduct = async (req: Request, res: Response) => {
 const deleteProduct = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as unknown as number;
-    if (!id) res.status(400).json({ message: "Invalid id" });
+    if (!id) res.status(400).json({ message: 'Invalid id' });
     const product = await productModel.delete(id);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
-    res.status(200).json({ message: "Product deleted" });
+    res.status(200).json({ message: 'Product deleted' });
   } catch (error) {
     res.status(500).json(error);
   }
 };
 
 const productRoute = (app: express.Application) => {
-  app.get("/products", getAllProducts);
-  app.get("/products/:id", getProduct);
-  app.post("/products", createProduct);
-  app.put("/products/:id", updateProduct);
-  app.delete("/products/:id", deleteProduct);
+  app.get('/products', getAllProducts);
+  app.get('/products/:id', getProduct);
+  app.post('/products', verifyToken, createProduct);
+  app.put('/products/:id', verifyToken, updateProduct);
+  app.delete('/products/:id', verifyToken, deleteProduct);
 };
 
 export { productRoute };
