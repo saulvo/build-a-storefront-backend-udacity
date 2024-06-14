@@ -8,10 +8,10 @@
     "start": "node dist/server.js",
     "build": "tsc && tsc-alias",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
-    "test": "jasmine-ts",
     "tsc": "tsc",
     "db-up": "db-migrate up",
-    "db-down": "db-migrate down"
+    "db-down": "db-migrate down",
+    "test": "npm run build && export NODE_ENV=test && npm run db-up && jasmine-ts"
   },
   "author": "Udacity",
   "license": "ISC",
